@@ -8,11 +8,7 @@ export class AnimalController {
 
   @Get()
   findAll(@Query() query: FindAnimalsDto) {
-    return this.animalService.findAll({
-      ...query,
-      page: Number(query.page) || 1,
-      limit: Math.min(Number(query.limit) || 20, 100),
-    });
+    return this.animalService.findAll(query);
   }
 
   @Get(':id')
