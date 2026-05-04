@@ -4,7 +4,7 @@ import { SelectQueryBuilder, Repository } from 'typeorm';
 import { Animal } from './animal.entity';
 import { FindAnimalsDto } from './dto/find-animals.dto';
 
-type Urgence = 'prioritaire' | 'urgent' | 'critique';
+type Urgence = 'prioritaire' | 'urgent' | 'critique' | null;
 
 const MS_PER_DAY = 86_400_000;
 
@@ -52,22 +52,24 @@ export class AnimalService {
   private applyUrgenceFilter(qb: SelectQueryBuilder<Animal>, urgence: Urgence) {
     const now = Date.now();
     const d30 = new Date(now - 30 * MS_PER_DAY);
+    const d60 = new Date(now - 60 * MS_PER_DAY);
     const d90 = new Date(now - 90 * MS_PER_DAY);
 
     if (urgence === 'prioritaire') {
-      qb.andWhere('a.date_entree >= :d30', { d30 });
+      qb.andWhere('a.date_entree < :d30 AND a.date_entree >= :d60', { d30, d60 });
     } else if (urgence === 'urgent') {
-      qb.andWhere('a.date_entree < :d30 AND a.date_entree >= :d90', { d30, d90 });
+      qb.andWhere('a.date_entree < :d60 AND a.date_entree >= :d90', { d60, d90 });
     } else if (urgence === 'critique') {
       qb.andWhere('a.date_entree < :d90', { d90 });
     }
   }
 
   private computeUrgence(animal: Animal): Urgence {
-    if (!animal.date_entree) return 'prioritaire';
+    if (!animal.date_entree) return null;
     const days = (Date.now() - new Date(animal.date_entree).getTime()) / MS_PER_DAY;
     if (days > 90) return 'critique';
-    if (days > 30) return 'urgent';
-    return 'prioritaire';
+    if (days > 60) return 'urgent';
+    if (days > 30) return 'prioritaire';
+    return null;
   }
 }
