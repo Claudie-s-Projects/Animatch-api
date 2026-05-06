@@ -90,7 +90,7 @@ export class ScrapingService {
       .get()
       .filter(Boolean)
       .join('\n');
-    const photo_url = $('img[src*="uploads"]').first().attr('src') ?? null;
+    const photo_url = $('img[alt*="adoption"]').first().attr('src') ?? null;
 
     const existing = await this.animals.findOneBy({ slug });
     const photo = photo_url ?? undefined;

@@ -6,6 +6,7 @@ import databaseConfig from './config/database.config';
 import { RefugeModule } from './refuge/refuge.module';
 import { AnimalModule } from './animal/animal.module';
 import { ScrapingModule } from './scraping/scraping.module';
+import { GuideModule } from './guide/guide.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ScrapingModule } from './scraping/scraping.module';
     RefugeModule,
     AnimalModule,
     ScrapingModule,
+    GuideModule,
   ],
 })
 export class AppModule {}
