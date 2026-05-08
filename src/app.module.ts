@@ -7,6 +7,7 @@ import { RefugeModule } from './refuge/refuge.module';
 import { AnimalModule } from './animal/animal.module';
 import { ScrapingModule } from './scraping/scraping.module';
 import { GuideModule } from './guide/guide.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { GuideModule } from './guide/guide.module';
     AnimalModule,
     ScrapingModule,
     GuideModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
