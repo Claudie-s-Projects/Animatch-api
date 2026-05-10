@@ -33,7 +33,7 @@ export class AuthService {
     const ok = await bcrypt.compare(dto.mot_de_passe, famille.mot_de_passe);
     if (!ok) throw new UnauthorizedException();
 
-    const token = this.jwt.sign({ sub: famille.id, email: famille.email });
+    const token = this.jwt.sign({ sub: famille.id, email: famille.email, prenom: famille.prenom });
     return { access_token: token };
   }
 }
