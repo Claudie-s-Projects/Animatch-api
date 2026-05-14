@@ -8,6 +8,7 @@ import { AnimalModule } from './animal/animal.module';
 import { ScrapingModule } from './scraping/scraping.module';
 import { GuideModule } from './guide/guide.module';
 import { AuthModule } from './auth/auth.module';
+import { FavoriModule } from './favori/favori.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AuthModule } from './auth/auth.module';
     ScrapingModule,
     GuideModule,
     AuthModule,
+    FavoriModule,
   ],
 })
 export class AppModule {}
