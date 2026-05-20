@@ -9,6 +9,7 @@ import { ScrapingModule } from './scraping/scraping.module';
 import { GuideModule } from './guide/guide.module';
 import { AuthModule } from './auth/auth.module';
 import { FavoriModule } from './favori/favori.module';
+import { DemandeModule } from './demande/demande.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { FavoriModule } from './favori/favori.module';
     GuideModule,
     AuthModule,
     FavoriModule,
+    DemandeModule,
   ],
 })
 export class AppModule {}
