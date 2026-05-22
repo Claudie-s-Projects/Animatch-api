@@ -30,7 +30,11 @@ export class DemandeService {
     });
   }
 
-  remove(familleId: number, animalId: number) {
-    return this.demandes.delete({ famille: { id: familleId }, animal: { id: animalId } });
+  async remove(familleId: number, animalId: number) {
+    const demande = await this.demandes.findOne({
+      where: { famille: { id: familleId }, animal: { id: animalId } },
+    });
+    if (!demande) return;
+    return this.demandes.remove(demande);
   }
 }
