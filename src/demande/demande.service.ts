@@ -29,4 +29,8 @@ export class DemandeService {
       order: { created_at: 'DESC' },
     });
   }
+
+  remove(familleId: number, animalId: number) {
+    return this.demandes.delete({ famille: { id: familleId }, animal: { id: animalId } });
+  }
 }

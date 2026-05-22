@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { Famille } from '../famille/famille.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -35,5 +36,17 @@ export class AuthService {
 
     const token = this.jwt.sign({ sub: famille.id, email: famille.email, prenom: famille.prenom });
     return { access_token: token };
+  }
+
+  async getMe(id: number) {
+    const famille = await this.familles.findOneBy({ id });
+    if (!famille) throw new UnauthorizedException();
+    const { mot_de_passe, ...result } = famille;
+    return result;
+  }
+
+  async updateProfile(id: number, dto: UpdateProfileDto) {
+    await this.familles.update({ id }, dto);
+    return this.getMe(id);
   }
 }
