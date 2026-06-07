@@ -18,6 +18,18 @@ export class Refuge {
   @Column({ nullable: true })
   telephone: string;
 
+  @Column({ unique: true, nullable: true })
+  email: string;
+
+  @Column({ nullable: true })
+  mot_de_passe: string;
+
+  @Column({ nullable: true })
+  adresse: string;
+
+  @Column({ nullable: true })
+  localite: string;
+
   @OneToMany(() => Animal, (animal) => animal.refuge)
   animaux: Animal[];
 }

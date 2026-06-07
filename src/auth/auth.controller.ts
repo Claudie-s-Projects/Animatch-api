@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { RegisterRefugeDto } from './dto/register-refuge.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('auth')
@@ -19,6 +20,12 @@ export class AuthController {
   @HttpCode(200)
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Post('register-refuge')
+  @HttpCode(201)
+  registerRefuge(@Body() dto: RegisterRefugeDto) {
+    return this.authService.registerRefuge(dto);
   }
 
   @Post('logout')
