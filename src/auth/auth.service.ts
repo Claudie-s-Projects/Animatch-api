@@ -64,4 +64,15 @@ export class AuthService {
     const { mot_de_passe, ...result } = saved;
     return result;
   }
+
+  async loginRefuge(dto: LoginDto) {
+    const refuge = await this.refuges.findOneBy({ email: dto.email });
+    if (!refuge || !refuge.mot_de_passe) throw new UnauthorizedException();
+
+    const ok = await bcrypt.compare(dto.mot_de_passe, refuge.mot_de_passe);
+    if (!ok) throw new UnauthorizedException();
+
+    const token = this.jwt.sign({ sub: refuge.id, email: refuge.email, nom: refuge.nom, role: 'refuge' });
+    return { access_token: token };
+  }
 }
