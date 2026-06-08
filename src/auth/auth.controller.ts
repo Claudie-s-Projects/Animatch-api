@@ -28,6 +28,12 @@ export class AuthController {
     return this.authService.registerRefuge(dto);
   }
 
+  @Post('login-refuge')
+  @HttpCode(200)
+  loginRefuge(@Body() dto: LoginDto) {
+    return this.authService.loginRefuge(dto);
+  }
+
   @Post('logout')
   @HttpCode(200)
   logout() {
