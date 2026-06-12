@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Demande } from './demande.entity';
@@ -37,4 +37,20 @@ export class DemandeService {
     if (!demande) return;
     return this.demandes.remove(demande);
   }
+
+   findByRefuge(refugeId: number) {
+    return this.demandes.find({
+      where: { animal: { refuge: { id: refugeId } } },
+      relations: ['animal', 'famille'],
+      order: { created_at: 'ASC' },
+    });
+  }
+async updateStatut(id: number, statut: string) {
+    const demande = await this.demandes.findOneBy({ id });
+    if (!demande) throw new NotFoundException();
+    demande.statut = statut;
+    return this.demandes.save(demande);
+  }
+
+
 }
