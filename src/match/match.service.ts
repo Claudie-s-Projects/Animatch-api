@@ -9,7 +9,7 @@ import { Animal } from '../animal/animal.entity';
 @Injectable()
 export class MatchService {
   private readonly apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
-  private readonly model = 'google/gemma-3-27b-it:free';
+ private readonly model ='openai/gpt-oss-120b:free';
 
   constructor(
     private readonly http: HttpService,
@@ -23,11 +23,12 @@ export class MatchService {
     animaux: string;
     activite: string;
     experience: string;
+     espece: string;
   }) {
     const animaux = await this.animals.find({
-      where: { disponible: true },
-      select: ['id', 'nom', 'espece', 'race', 'age', 'sexe', 'description'],
-      take: 30,
+      where: { disponible: true, espece: famille.espece },
+      select: ['id', 'nom', 'espece', 'race', 'age', 'sexe', 'description','photo_url'],
+      take: 40,
     });
 
     const listeAnimaux = animaux
@@ -46,13 +47,15 @@ Voici le profil de la famille :
 Voici les animaux actuellement disponibles à l'adoption :
 ${listeAnimaux}
 
-En tenant compte du profil de cette famille, sélectionne les 3 animaux qui leur correspondent le mieux. Pour chaque animal choisi, rédige une explication chaleureuse et personnalisée (2-3 phrases) qui explique pourquoi cet animal est adapté à leur situation.
+En tenant compte du profil de cette famille, sélectionne les 5 animaux qui leur correspondent le mieux. Pour chaque animal choisi, rédige une explication chaleureuse et personnalisée (2-3 phrases) qui explique pourquoi cet animal est adapté à leur situation.
 
 Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ni après, au format suivant :
 [
   { "id": 1, "explication": "..." },
   { "id": 2, "explication": "..." },
-  { "id": 3, "explication": "..." }
+  { "id": 3, "explication": "..." },
+    { "id": 4, "explication": "..." },
+    { "id": 5, "explication": "..." }
 ]`;
 
     const response = await firstValueFrom(
@@ -63,7 +66,7 @@ Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ni après, au 
             model: this.model,
             messages: [{ role: 'user', content: prompt }],
             temperature: 0.6,
-            max_tokens: 600,
+            max_tokens: 1000,
           },
           {
             headers: {
