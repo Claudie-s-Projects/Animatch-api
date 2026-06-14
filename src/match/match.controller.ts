@@ -14,6 +14,7 @@ export class MatchController {
     animaux: string;
     activite: string;
     experience: string;
+    espece: string;
   }) {
     return this.matchService.match(body);
   }
