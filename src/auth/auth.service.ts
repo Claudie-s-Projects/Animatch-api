@@ -75,4 +75,11 @@ export class AuthService {
     const token = this.jwt.sign({ sub: refuge.id, email: refuge.email, nom: refuge.nom, role: 'refuge' });
     return { access_token: token };
   }
+
+   async getMeRefuge(id: number) {
+    const refuge = await this.refuges.findOneBy({ id });
+    if (!refuge) throw new UnauthorizedException();
+    const { mot_de_passe, ...result } = refuge;
+    return result;
+  }
 }

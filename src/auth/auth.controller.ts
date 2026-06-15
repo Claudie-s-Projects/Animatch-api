@@ -5,6 +5,8 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterRefugeDto } from './dto/register-refuge.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { JwtRefugeGuard } from
+  './guards/jwt-refuge.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -50,5 +52,10 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   updateProfile(@Req() req: { user: { id: number } }, @Body() dto: UpdateProfileDto) {
     return this.authService.updateProfile(req.user.id, dto);
+  }
+   @Get('me-refuge')
+  @UseGuards(JwtRefugeGuard)
+  getMeRefuge(@Req() req: { user: { id: number } }) {
+    return this.authService.getMeRefuge(req.user.id);
   }
 }
