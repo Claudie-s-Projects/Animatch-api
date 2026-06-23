@@ -26,8 +26,8 @@ export class AuthService {
     const famille = this.familles.create({ ...dto, mot_de_passe: hash });
     const saved = await this.familles.save(famille);
 
-    const { mot_de_passe, ...result } = saved;
-    return result;
+    const token = this.jwt.sign({ sub: saved.id, email: saved.email, prenom: saved.prenom, role: 'famille' });
+    return { access_token: token };
   }
 
   async login(dto: LoginDto) {
@@ -61,8 +61,8 @@ export class AuthService {
     const refuge = this.refuges.create({ ...dto, mot_de_passe: hash });
     const saved = await this.refuges.save(refuge);
 
-    const { mot_de_passe, ...result } = saved;
-    return result;
+    const token = this.jwt.sign({ sub: saved.id, email: saved.email, nom: saved.nom, role: 'refuge' });
+    return { access_token: token };
   }
 
   async loginRefuge(dto: LoginDto) {
