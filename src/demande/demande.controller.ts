@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get,Patch, Param, ParseIntPipe, Post, Req, UseGuards} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { DemandeService } from './demande.service';
 import { CreateDemandeDto } from './dto/create-demande.dto';
+import { JwtRefugeGuard } from '../auth/guards/jwt-refuge.guard';
+import { UpdateStatutDto } from './dto/update-statut.dto';
 
 @Controller('demandes')
 @UseGuards(AuthGuard('jwt'))
@@ -21,5 +23,18 @@ export class DemandeController {
   @Delete(':animalId')
   remove(@Req() req: { user: { id: number } }, @Param('animalId', ParseIntPipe) animalId: number) {
     return this.demandeService.remove(req.user.id, animalId);
+  }
+
+   @Get('refuge')
+  @UseGuards(JwtRefugeGuard)
+  findByRefuge(@Req() req: { user: { id: number } }) {
+    return this.demandeService.findByRefuge(req.user.id);
+  }
+
+   @Patch(':id/statut')
+  @UseGuards(JwtRefugeGuard)
+  updateStatut(@Param('id', ParseIntPipe) id: number, @Body() dto:
+  UpdateStatutDto) {
+    return this.demandeService.updateStatut(id, dto.statut);
   }
 }

@@ -10,6 +10,7 @@ import { GuideModule } from './guide/guide.module';
 import { AuthModule } from './auth/auth.module';
 import { FavoriModule } from './favori/favori.module';
 import { DemandeModule } from './demande/demande.module';
+import { MatchModule } from './match/match.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { DemandeModule } from './demande/demande.module';
     AuthModule,
     FavoriModule,
     DemandeModule,
+    MatchModule,
   ],
 })
 export class AppModule {}

@@ -3,7 +3,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { RegisterRefugeDto } from './dto/register-refuge.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { JwtRefugeGuard } from
+  './guards/jwt-refuge.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -19,6 +22,18 @@ export class AuthController {
   @HttpCode(200)
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Post('register-refuge')
+  @HttpCode(201)
+  registerRefuge(@Body() dto: RegisterRefugeDto) {
+    return this.authService.registerRefuge(dto);
+  }
+
+  @Post('login-refuge')
+  @HttpCode(200)
+  loginRefuge(@Body() dto: LoginDto) {
+    return this.authService.loginRefuge(dto);
   }
 
   @Post('logout')
@@ -37,5 +52,10 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   updateProfile(@Req() req: { user: { id: number } }, @Body() dto: UpdateProfileDto) {
     return this.authService.updateProfile(req.user.id, dto);
+  }
+   @Get('me-refuge')
+  @UseGuards(JwtRefugeGuard)
+  getMeRefuge(@Req() req: { user: { id: number } }) {
+    return this.authService.getMeRefuge(req.user.id);
   }
 }
