@@ -6,10 +6,14 @@ import { Repository } from 'typeorm';
 import { firstValueFrom, timeout } from 'rxjs';
 import { Animal } from '../animal/animal.entity';
 
+interface OpenRouterResponse {
+  choices: { message: { content: string } }[];
+}
+
 @Injectable()
 export class MatchService {
   private readonly apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
- private readonly model ='openai/gpt-oss-120b:free';
+  private readonly model = 'nvidia/nemotron-3-super-120b-a12b:free';
 
   constructor(
     private readonly http: HttpService,
@@ -23,16 +27,28 @@ export class MatchService {
     animaux: string;
     activite: string;
     experience: string;
-     espece: string;
+    espece: string;
   }) {
     const animaux = await this.animals.find({
       where: { disponible: true, espece: famille.espece },
-      select: ['id', 'nom', 'espece', 'race', 'age', 'sexe', 'description','photo_url'],
+      select: [
+        'id',
+        'nom',
+        'espece',
+        'race',
+        'age',
+        'sexe',
+        'description',
+        'photo_url',
+      ],
       take: 40,
     });
 
     const listeAnimaux = animaux
-      .map(a => `- ID ${a.id} | ${a.nom} | ${a.espece ?? '?'} | ${a.race ?? '?'} | ${a.age ?? '?'} | ${a.sexe ?? '?'} | Description : ${a.description ?? 'aucune'}`)
+      .map(
+        (a) =>
+          `- ID ${a.id} | ${a.nom} | ${a.espece ?? '?'} | ${a.race ?? '?'} | ${a.age ?? '?'} | ${a.sexe ?? '?'} | Description : ${a.description ?? 'aucune'}`,
+      )
       .join('\n');
 
     const prompt = `Tu es un conseiller bienveillant spécialisé dans l'adoption animale. Tu connais bien les besoins des animaux et les réalités du quotidien des familles. Ta mission est d'aider cette famille à trouver l'animal qui correspond vraiment à leur mode de vie, pour que l'adoption soit une réussite pour tout le monde.
@@ -58,15 +74,37 @@ Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ni après, au 
     { "id": 5, "explication": "..." }
 ]`;
 
-    const response = await firstValueFrom(
+    // Les modèles gratuits OpenRouter échouent parfois (saturation, lenteur) : un seul nouvel essai
+    const response = await this.callModel(prompt).catch(() =>
+      this.callModel(prompt),
+    );
+
+    // Certains modèles entourent le JSON de balises markdown ```json ... ```
+    const content = (response.data.choices[0]?.message?.content ?? '[]')
+      .replace(/```json|```/g, '')
+      .trim();
+    const resultats = JSON.parse(content) as {
+      id: number;
+      explication: string;
+    }[];
+
+    return resultats.map((r) => ({
+      ...animaux.find((a) => a.id === r.id),
+      explication: r.explication,
+    }));
+  }
+
+  private callModel(prompt: string) {
+    return firstValueFrom(
       this.http
-        .post(
+        .post<OpenRouterResponse>(
           this.apiUrl,
           {
             model: this.model,
             messages: [{ role: 'user', content: prompt }],
             temperature: 0.6,
-            max_tokens: 1000,
+            // 2500 : le modèle dépasse 1000 tokens de complétion (réponse tronquée → JSON invalide)
+            max_tokens: 2500,
           },
           {
             headers: {
@@ -75,15 +113,8 @@ Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ni après, au 
             },
           },
         )
-        .pipe(timeout(30000)),
+        // 60s : les modèles gratuits OpenRouter dépassent parfois 30s
+        .pipe(timeout(60000)),
     );
-
-    const content = response.data.choices[0]?.message?.content ?? '[]';
-    const resultats = JSON.parse(content);
-
-    return resultats.map((r: { id: number; explication: string }) => ({
-      ...animaux.find(a => a.id === r.id),
-      explication: r.explication,
-    }));
   }
 }
